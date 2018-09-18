@@ -28,12 +28,12 @@ public class Kenken {
         try {
             FileReader fileReader = new FileReader(fileName);
             BufferedReader bufferedReader = new BufferedReader(fileReader);
-
+            int puzzleID = 0;
             while((line = bufferedReader.readLine()) != null) {
                 char firstCharacter = line.charAt(0);
                 if(Character.isDigit(firstCharacter)) //new Kenken
                 {
-                    if(kenken != null) {
+                    if(puzzleID != 0) {
 //                        if(kenken.test()) {
 //                            System.out.println("oh be");
 //                            return;
@@ -42,9 +42,11 @@ public class Kenken {
 //                            System.out.println("vah be");
 //                            return;
 //                        }
-                       kenken.solveKenken();
+                        System.out.println("Puzzle " + puzzleID + ":");
+                        kenken.solveKenken();
                     }
 
+                    puzzleID++;
                     kenken = new Kenken();
                     kenken.dimension = firstCharacter - '0';
                     kenken.groupRules = new HashMap<>();
@@ -54,6 +56,7 @@ public class Kenken {
                 }
             }
 
+            System.out.println("Puzzle " + puzzleID + ":");
             kenken.solveKenken();
 
             bufferedReader.close();
@@ -79,9 +82,12 @@ public class Kenken {
 
     private void solveKenken() {
         if(dimension > 4) {
-            System.out.println("not gonna try with dimension: " + dimension);
             return;
         }
+
+        long startTime = System.nanoTime();
+        System.out.println("Approach 1:");
+        long statesGenerated = 0;
 
         Solution initialSolution  = new Solution(dimension);
         Stack<Solution> solutionStack = new Stack<>();
@@ -90,8 +96,15 @@ public class Kenken {
         while(!solutionStack.empty()) {
             Solution current = solutionStack.pop();
             if(current.isComplete()) {
+                statesGenerated++;
                 if(trySolution(current)) {
-                    System.out.println("Correct solution: " + current);
+                    System.out.print("Solution:");
+                    System.out.println(current);
+                    System.out.println("States generated: " + statesGenerated);
+                    double time = (System.nanoTime() - startTime) /1000.0;
+                    System.out.println("Time in microseconds: " + time);
+                    System.out.println("States/microseconds: " + statesGenerated/time);//TODO ask
+
                     return;
                 }
             }
@@ -276,13 +289,13 @@ public class Kenken {
 
         @Override
         public String toString() {
-            String result = "filled: " + filledNumbers + ", numbers:\n ";
+            String result = "";
             for(int i = 0; i < dimension; i++) {
+                result += "\n";
                 for(int j = 0; j < dimension; j++) {
                     int index = i * dimension + j;
-                    result += numbers[index] + " ";
+                    result += numbers[index] + "\t";
                 }
-                result += "\n";
             }
             return result;
         }
