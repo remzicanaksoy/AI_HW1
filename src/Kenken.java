@@ -18,13 +18,6 @@ public class Kenken {
         String line = null;
         Kenken kenken = null;
 
-//        kenken = new Kenken();
-//        kenken.dimension = 4;
-//        kenken.solveKenken();
-//        if(true) {
-//            return;
-//        }
-
         try {
             FileReader fileReader = new FileReader(fileName);
             BufferedReader bufferedReader = new BufferedReader(fileReader);
@@ -34,16 +27,7 @@ public class Kenken {
                 if(Character.isDigit(firstCharacter)) //new Kenken
                 {
                     if(puzzleID != 0) {
-//                        if(kenken.test()) {
-//                            System.out.println("oh be");
-//                            return;
-//                        }
-//                        else {
-//                            System.out.println("vah be");
-//                            return;
-//                        }
-                        System.out.println("Puzzle " + puzzleID + ":");
-                        kenken.solveKenken();
+                        kenken.solveKenken(3, puzzleID);
                     }
 
                     puzzleID++;
@@ -56,8 +40,7 @@ public class Kenken {
                 }
             }
 
-            System.out.println("Puzzle " + puzzleID + ":");
-            kenken.solveKenken();
+            kenken.solveKenken(3, puzzleID);
 
             bufferedReader.close();
         }
@@ -74,33 +57,42 @@ public class Kenken {
     }
 
     private boolean test() {
-        Solution solution = new Solution(4);
+        Solution solution = new Solution(4, 1);
         solution.numbers = testArray;
         solution.filledNumbers = 16;
         return trySolution(solution);
     }
 
-    private void solveKenken() {
-        if(dimension > 4) {
+    private void solveKenken(int approach, int puzzleID) {
+        if(approach == 1 && dimension > 4) {
             return;
         }
 
         long startTime = System.nanoTime();
-        System.out.println("Approach 1:");
+        System.out.println("Puzzle " + puzzleID + ":");
+        System.out.println("Approach " + approach + ":");
         long statesGenerated = 0;
 
-        Solution initialSolution  = new Solution(dimension);
+        Solution initialSolution  = new Solution(dimension, approach);
         Stack<Solution> solutionStack = new Stack<>();
         solutionStack.push(initialSolution);
 
         while(!solutionStack.empty()) {
             Solution current = solutionStack.pop();
-            if(current.isComplete()) {
+            if(approach == 2 || approach == 3)
+            {
                 statesGenerated++;
+                //System.out.println(current);
+            }
+
+            if(current.isComplete()) {
                 if(trySolution(current)) {
+                    if(approach == 1) {
+                        statesGenerated++;
+                    }
                     System.out.print("Solution:");
                     System.out.println(current);
-                    System.out.println("States generated: " + statesGenerated);
+                    System.out.println("States generated: " + (statesGenerated-1));
                     double time = (System.nanoTime() - startTime) /1000.0;
                     System.out.println("Time in microseconds: " + time);
                     System.out.println("States/microseconds: " + statesGenerated/time);//TODO ask
@@ -109,10 +101,15 @@ public class Kenken {
                 }
             }
             else {
-                Solution[] children = current.createChildren();
+                if(approach == 2 || approach == 3) {
+                    if(!trySolution(current)) {
+                        continue;
+                    }
+                }
+                List<Solution> children = current.createChildren();
 
-                for(int i = 0; i < children.length; i++) {
-                    solutionStack.push(children[i]);
+                for(int i = 0; i < children.size(); i++) {
+                    solutionStack.push(children.get(i));
                 }
             }
         }
@@ -132,6 +129,10 @@ public class Kenken {
         for(int i = 0; i < dimension; i++) {
 
             for(int j = 0; j < dimension; j++) {
+                if(index >= current.filledNumbers) {
+                    return true;
+                }
+
                 int number = current.numbers[index];
                 index++;
 
@@ -253,34 +254,73 @@ public class Kenken {
         int[] numbers;
         int filledNumbers;
         int dimension;
+        Set<Integer>[] rowSets;
+        Set<Integer>[] columnSets;
+        int approach;
 
-        public Solution(int dimension) {
+        public Solution(int dimension, int approach) {
             this.dimension = dimension;
             numbers = new int[dimension*dimension];
             filledNumbers = 0;
+            this.approach = approach;
+            if(approach == 3) {
+                rowSets = new HashSet[dimension];
+                columnSets = new HashSet[dimension];
+                for(int i = 0; i < dimension; i++) {
+                    rowSets[i] = new HashSet<>();
+                    columnSets[i] = new HashSet<>();
+                }
+            }
         }
 
         public Solution(Solution solution) {
             this.dimension = solution.dimension;
             numbers = solution.numbers.clone();
             filledNumbers = solution.filledNumbers;
+            this.approach = solution.approach;
+            if(approach == 3) {
+                rowSets = new HashSet[dimension];
+                columnSets = new HashSet[dimension];
+                for(int i = 0; i < dimension; i++) {
+                    rowSets[i] = new HashSet<>();
+                    rowSets[i].addAll(solution.rowSets[i]);
+                    columnSets[i] = new HashSet<>();
+                    columnSets[i].addAll(solution.columnSets[i]);
+                }
+            }
         }
 
-        public Solution[] createChildren() {
-            Solution[] children = new Solution[dimension];
+        public List<Solution> createChildren() {
+            List<Solution> children = new ArrayList<Solution>();
 
             for(int i = 0; i < dimension; i++) {
                 Solution childSolution = new Solution(this);
-                childSolution.next(dimension-i);
-                children[i] = childSolution;
+                if(childSolution.next(dimension-i))
+                {
+                    children.add(childSolution);
+                }
             }
 
             return children;
         }
 
-        private void next(int childIndex) {
+        private boolean next(int childIndex) {
+            if(approach == 3) {
+                int i = filledNumbers / dimension;
+                int j = filledNumbers % dimension;
+
+                if(rowSets[i].contains(childIndex) || columnSets[j].contains(childIndex)) {
+                    return false;
+                }
+                else {
+                    rowSets[i].add(childIndex);
+                    columnSets[j].add(childIndex);
+                }
+            }
+
             numbers[filledNumbers] = childIndex;
             filledNumbers++;
+            return true;
         }
 
         public boolean isComplete() {
