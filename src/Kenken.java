@@ -1,7 +1,4 @@
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.*;
 
 public class Kenken {
@@ -12,11 +9,19 @@ public class Kenken {
     int[] testArray = {2,4,3,1,1,3,4,2,4,1,2,3,3,2,1,4};
     HashMap<Integer, KenkenRule>  groupRules;
     int dimension;
+    boolean filePrint = false;
+    static FileWriter writer;
+
 
     public static void main(String[] args) {
-        String fileName = "input1.txt";
+        String fileName = "input2.txt";
         String line = null;
         Kenken kenken = null;
+        try {
+            writer = new FileWriter("output.txt", false);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         try {
             FileReader fileReader = new FileReader(fileName);
@@ -27,7 +32,7 @@ public class Kenken {
                 if(Character.isDigit(firstCharacter)) //new Kenken
                 {
                     if(puzzleID != 0) {
-                        kenken.solveKenken(1, puzzleID);
+                        kenken.solveKenken(puzzleID);
                     }
 
                     puzzleID++;
@@ -40,8 +45,7 @@ public class Kenken {
                 }
             }
 
-            kenken.solveKenken(1, puzzleID);
-
+            kenken.solveKenken(puzzleID);
             bufferedReader.close();
         }
         catch(FileNotFoundException ex) {
@@ -53,6 +57,26 @@ public class Kenken {
             System.out.println(
                     "Error reading file '"
                             + fileName + "'");
+        }
+    }
+
+    private void solveKenken(int puzzleID) {
+        if(filePrint) {
+            try {
+                writer = new FileWriter("output.txt", true);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        //solveKenken(1, puzzleID);
+        solveKenken(2, puzzleID);
+        solveKenken(3, puzzleID);
+        solveKenken(4, puzzleID);
+        solveKenken(5, puzzleID);
+        try {
+            writer.close();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
@@ -69,8 +93,19 @@ public class Kenken {
         }
 
         long startTime = System.nanoTime();
-        System.out.println("Puzzle " + puzzleID + ":");
-        System.out.println("Approach " + approach + ":");
+        if(filePrint) {
+            try {
+                writer.write("Puzzle " + puzzleID + ":\n");
+                writer.write("Approach " + approach + ":\n");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        else {
+            System.out.println("Puzzle " + puzzleID + ":");
+            System.out.println("Approach " + approach + ":");
+        }
+
         long statesGenerated = 0;
 
         Solution initialSolution  = new Solution(dimension, approach);
@@ -79,16 +114,17 @@ public class Kenken {
             boolean update = checkConstantRules(initialSolution);
             while(update)
             {
-                update = checkRCconstraints(initialSolution);
+                update = false;
                 if(approach == 5)
                 {
-                    //update = update | checkGroupConstraints(initialSolution);
+                    update = checkGroupConstraints(initialSolution);
                 }
+
+                update = update || checkRCconstraints(initialSolution, dimension);
+
             }
         }
-        //TODO probably place constants in the initial solution, don't forget to update filled numbers properly,
-        //TODO also don't forget to update sets and also put numbers if there are unique in the sets
-        //TODO each update may require additional updates
+
         solutionStack.push(initialSolution);
 
         while(!solutionStack.empty()) {
@@ -105,15 +141,33 @@ public class Kenken {
                 }
 
                 if(trySolution(current, false)) {
-                    System.out.print("Solution:");
-                    System.out.println(current);
-                    if(approach == 1) {
-                        statesGenerated++;
+                    if(filePrint) {
+                        try {
+                            writer.write("Solution:");
+                            writer.write(current.toString() + "\n");
+                            if(approach == 1) {
+                                statesGenerated++;
+                            }
+                            writer.write("States generated: " + (statesGenerated-1) + "\n");
+                            double time = (System.nanoTime() - startTime) /1000.0;
+                            writer.write("Time in microseconds: " + time + "\n");
+                            writer.write("States/microseconds: " + statesGenerated/time + "\n");//TODO ask
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
                     }
-                    System.out.println("States generated: " + (statesGenerated-1));
-                    double time = (System.nanoTime() - startTime) /1000.0;
-                    System.out.println("Time in microseconds: " + time);
-                    System.out.println("States/microseconds: " + statesGenerated/time);//TODO ask
+                    else
+                    {
+                        System.out.print("Solution:");
+                        System.out.println(current);
+                        if(approach == 1) {
+                            statesGenerated++;
+                        }
+                        System.out.println("States generated: " + (statesGenerated-1));
+                        double time = (System.nanoTime() - startTime) /1000.0;
+                        System.out.println("Time in microseconds: " + time);
+                        System.out.println("States/microseconds: " + statesGenerated/time);//TODO ask
+                    }
 
                     return;
                 }
@@ -133,7 +187,35 @@ public class Kenken {
         }
     }
 
-    private boolean checkRCconstraints(Solution initialSolution) {
+    private boolean checkGroupConstraints(Solution initialSolution) {
+        //check all constraints
+        boolean result = false;
+
+        for(KenkenRule rule : groupRules.values()) {
+            //find the empty cell, if only one cell is empty for the rule
+            int[] emptyCell = initialSolution.checkIfOnlyOneEmptyCell(rule);
+            //find possible numbers and their conflicts
+            if(emptyCell == null) {
+                continue;
+            }
+            List<Integer> possibleNumbers = initialSolution.findPossibleNumbers(rule);
+
+            if(possibleNumbers.size() == 1) {
+                result = true;
+                int number = possibleNumbers.get(0);
+                int index = dimension * emptyCell[0] + emptyCell[1];
+                initialSolution.numbers[index] = number;
+                initialSolution.rowSets[emptyCell[0]].add(number);
+                initialSolution.columnSets[emptyCell[1]].add(number);
+                initialSolution.filledNumbers++;
+            }
+        }
+
+        //if only one value remains apply it, don't forget to update related structures like rowSets and columnSets
+        return result;
+    }
+
+    private static boolean checkRCconstraints(Solution initialSolution, int dimension) {
         boolean result = false;
         for(int i = 0; i < initialSolution.numbers.length; i++) {
             if(initialSolution.numbers[i] == 0) {
@@ -141,7 +223,7 @@ public class Kenken {
                 int column = i % dimension;
                 Set<Integer> rowSet = initialSolution.rowSets[row];
                 Set<Integer> columnSet = initialSolution.columnSets[column];
-                int unique = findUnique(rowSet, columnSet);
+                int unique = findUnique(rowSet, columnSet, dimension);
                 if(unique != -1) {
                     result = true;
                     initialSolution.numbers[i] = unique;
@@ -152,58 +234,22 @@ public class Kenken {
             }
         }
 
-
-//        for(int row = 0; row < initialSolution.rowSets.length; row++) {
-//            Set<Integer> s = initialSolution.rowSets[row];
-//            if(s.size() == dimension - 1) {
-//                result = true;
-//                int uniqueNumber = findMissing(s);
-//                for(int column = 0; column < dimension; column++) {
-//                    int index = row * dimension + column;
-//                    if(initialSolution.numbers[index] == 0) {
-//                        initialSolution.numbers[index] = uniqueNumber;
-//                        initialSolution.filledNumbers++;
-//                        initialSolution.rowSets[row].add(uniqueNumber);
-//                        initialSolution.columnSets[column].add(uniqueNumber);
-//                    }
-//                }
-//            }
-//        }
-//
-//        for(int column = 0; column < initialSolution.columnSets.length; column++) {
-//            Set<Integer> s = initialSolution.columnSets[column];
-//            if(s.size() == dimension - 1) {
-//                result = true;
-//                int uniqueNumber = findMissing(s);
-//
-//                for(int row = 0; row < dimension; row++) {
-//                    int index = row * dimension + column;
-//                    if(initialSolution.numbers[index] == 0) {
-//                        initialSolution.numbers[index] = uniqueNumber;
-//                        initialSolution.filledNumbers++;
-//                        initialSolution.columnSets[column].add(uniqueNumber);
-//                        initialSolution.rowSets[row].add(uniqueNumber);
-//                    }
-//                }
-//            }
-//        }
-
         return result;
     }
 
-    private int findUnique(Set<Integer> rowSet, Set<Integer> columnSet) {
+    private static int findUnique(Set<Integer> rowSet, Set<Integer> columnSet, int dimension) {
         Set<Integer> union = new HashSet<>();
         union.addAll(columnSet);
         union.addAll(rowSet);
         if(union.size() == dimension-1) {
-            int unique = findMissing(union);
+            int unique = findMissing(union, dimension);
             return unique;
         }
 
         return -1;
     }
 
-    private int findMissing(Set<Integer> s) {
+    private static int findMissing(Set<Integer> s, int dimension) {
         for(int i = 1; i <= dimension; i++) {
             if(!s.contains(i)) {
                 return i;
@@ -252,7 +298,6 @@ public class Kenken {
                 }
 
                 int number = current.numbers[i*dimension + j];
-                //TODO possibly I will put => if number == o continue, ow do what you used to do
                 if(number == 0 && current.approach > 3) {
                     continue;
                 }
@@ -422,10 +467,20 @@ public class Kenken {
                 if(childSolution.next(dimension-i))
                 {
                     if(approach > 3) {
-                        while (checkRCconstraints(childSolution));
-                        //if(trySolution(childSolution, true)) {
+                        boolean update = true;
+                        while (update) {
+                            update = false;
+
+                            if(approach == 5)
+                            {
+                                update = checkGroupConstraints(childSolution);
+                            }
+
+                            update = update || checkRCconstraints(childSolution, dimension);
+                        }
+                        if(approach !=5 || checkPossibleValues(childSolution)) {
                             children.add(childSolution);
-                        //}
+                        }
                     }
                     else {
                         children.add(childSolution);
@@ -436,11 +491,81 @@ public class Kenken {
             return children;
         }
 
+        private boolean checkPossibleValues(Solution childSolution) {
+            for(int i = 0; i < childSolution.numbers.length; i++) {
+                if(childSolution.numbers[i] != 0) {
+                    continue;
+                }
+                int row = i /dimension;
+                int column = i % dimension;
+
+                Set<Integer> union = new HashSet<>();
+                union.addAll(rowSets[row]);
+                union.addAll(columnSets[column]);
+                if(union.size() == dimension) {
+                    return false;
+                }
+            }
+
+            for(KenkenRule rule : groupRules.values()) {
+                if(!isPossible(childSolution, rule)) {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        private boolean isPossible(Solution childSolution, KenkenRule rule) {
+            if(rule.operation == Operation.ADD) {
+                int sum = 0;
+                for(int[] cell : rule.groupCells) {
+                    int index = dimension * cell[0] + cell[1];
+                    sum += childSolution.numbers[index] == 0 ? 1 : childSolution.numbers[index];
+                }
+
+                if(sum > rule.target)
+                {
+                    return false;
+                }
+            }
+            else if(rule.operation == Operation.MULTIPLY) {
+                int sum = 1;
+                for(int[] cell : rule.groupCells) {
+                    int index = dimension * cell[0] + cell[1];
+                    sum *= childSolution.numbers[index] == 0 ? 1 : childSolution.numbers[index];
+                }
+
+                if(sum > rule.target)
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
         private boolean next(int childIndex) {
             int firstZero = filledNumbers;
             if(approach > 3) {
                 firstZero = findFirstZero(numbers);
             }
+
+            if(approach == 5) {
+                int unary = convertIndexToUnary(firstZero);
+
+                KenkenRule rule = groupRules.get(unary);
+                int[] emptyCells = null;
+                if(rule != null) {
+                    emptyCells = checkIfOnlyOneEmptyCell(rule);
+                }
+                if(emptyCells != null) {
+                    List<Integer> possibleNumbers = findPossibleNumbers(rule);
+                    if(!possibleNumbers.contains(childIndex)) {
+                        return false;
+                    }
+                }
+            }
+
 
             if(approach >= 3) {
                 int i = firstZero / dimension;
@@ -459,6 +584,12 @@ public class Kenken {
             filledNumbers++;
 
             return true;
+        }
+
+        private int convertIndexToUnary(int firstZero) {
+            int row = firstZero / dimension;
+            int column = firstZero % dimension;
+            return row * 10 + column;
         }
 
         private int findFirstZero(int[] numbers) {
@@ -487,6 +618,138 @@ public class Kenken {
                     result += numbers[index] + "\t";
                 }
             }
+            return result;
+        }
+
+        public int[] checkIfOnlyOneEmptyCell(KenkenRule rule) {
+            if(rule.operation == Operation.CONSTANT) {
+                return null;
+            }
+
+            int count = 0;
+            int[] emptyCell = null;
+
+            for(int[] cell : rule.groupCells) {
+                int index = dimension * cell[0] + cell[1];
+                if(numbers[index] == 0) {
+                    count++;
+                    emptyCell = cell;
+                }
+
+                if(count > 1) {
+                    return null;
+                }
+            }
+
+            return emptyCell;
+        }
+
+        public List<Integer> findPossibleNumbers(KenkenRule rule) {
+            List<Integer> result = new ArrayList<>();
+            int[] emptyCell = null;
+
+            if(rule.operation == Operation.ADD) {
+                int sum = 0;
+                for(int[] cell : rule.groupCells) {
+                    int index = dimension * cell[0] + cell[1];
+                    if(numbers[index] != 0) {
+                        sum += numbers[index];
+                    }
+                    else {
+                        emptyCell = cell;
+                    }
+                }
+
+                int missing = rule.target - sum;
+                if(!rowSets[emptyCell[0]].contains(missing) && !columnSets[emptyCell[1]].contains(missing)) {
+                    if(missing > 0 && missing <=dimension) {
+                        result.add(missing);
+                    }
+                }
+            }
+            else if(rule.operation == Operation.MULTIPLY) {
+                int sum = 1;
+                for(int[] cell : rule.groupCells) {
+                    int index = dimension * cell[0] + cell[1];
+                    if(numbers[index] != 0) {
+                        sum *= numbers[index];
+                    }
+                    else {
+                        emptyCell = cell;
+                    }
+                }
+
+                if(rule.target % sum == 0 && rule.target / sum <= dimension) {
+                    int missing = rule.target / sum;
+                    if(!rowSets[emptyCell[0]].contains(missing) && !columnSets[emptyCell[1]].contains(missing)) {
+                        if(missing > 0 && missing <=dimension) {
+                            result.add(missing);
+                        }
+                    }
+                }
+            }
+            else if(rule.operation == Operation.SUBTRACT) {
+                int[] filledCell;
+                int filledIndex = 0;
+
+                for(int[] cell : rule.groupCells) {
+                    int index = dimension * cell[0] + cell[1];
+                    if(numbers[index] == 0) {
+                        emptyCell = cell;
+                    }
+                    else {
+                        filledIndex = index;
+                    }
+                }
+
+                int firstPossibility = rule.target + numbers[filledIndex];
+                if(firstPossibility <= dimension && firstPossibility > 0) {
+                    if(!rowSets[emptyCell[0]].contains(firstPossibility) && !columnSets[emptyCell[1]].contains(firstPossibility)) {
+                        result.add(firstPossibility);
+                    }
+                }
+
+                int secondPossibility = numbers[filledIndex] - rule.target;
+                if(secondPossibility <= dimension && secondPossibility > 0) {
+                    if(!rowSets[emptyCell[0]].contains(secondPossibility) && !columnSets[emptyCell[1]].contains(secondPossibility)) {
+                        result.add(secondPossibility);
+                    }
+                }
+            }
+            else if(rule.operation == Operation.DIVIDE) {
+                int[] filledCell;
+                int filledIndex = 0;
+
+                for(int[] cell : rule.groupCells) {
+                    int index = dimension * cell[0] + cell[1];
+
+                    if(numbers[index] == 0) {
+                        emptyCell = cell;
+                    }
+                    else {
+                        filledIndex = index;
+                    }
+                }
+
+                int firstPossibility = rule.target * numbers[filledIndex];
+                if(firstPossibility <= dimension && firstPossibility > 0) {
+                    if(!rowSets[emptyCell[0]].contains(firstPossibility) && !columnSets[emptyCell[1]].contains(firstPossibility)) {
+                        result.add(firstPossibility);
+                    }
+                }
+
+                int secondPossibility = -1;
+                if(numbers[filledIndex] % rule.target == 0)
+                {
+                    secondPossibility = numbers[filledIndex] / rule.target;
+                }
+                if(secondPossibility <= dimension && secondPossibility > 0) {
+                    if(!rowSets[emptyCell[0]].contains(secondPossibility) && !columnSets[emptyCell[1]].contains(secondPossibility)) {
+                        result.add(secondPossibility);
+                    }
+                }
+            }
+
             return result;
         }
     }
