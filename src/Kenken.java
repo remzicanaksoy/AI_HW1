@@ -9,16 +9,16 @@ public class Kenken {
     int[] testArray = {2,4,3,1,1,3,4,2,4,1,2,3,3,2,1,4};
     HashMap<Integer, KenkenRule>  groupRules;
     int dimension;
-    boolean filePrint = false;
+    boolean filePrint = true;
     static FileWriter writer;
 
 
     public static void main(String[] args) {
-        String fileName = "input2.txt";
+        String fileName = "input1.txt";
         String line = null;
         Kenken kenken = null;
         try {
-            writer = new FileWriter("output.txt", false);
+            writer = new FileWriter("solutions.txt", false);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -63,12 +63,12 @@ public class Kenken {
     private void solveKenken(int puzzleID) {
         if(filePrint) {
             try {
-                writer = new FileWriter("output.txt", true);
+                writer = new FileWriter("solutions.txt", true);
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
-        //solveKenken(1, puzzleID);
+        solveKenken(1, puzzleID);
         solveKenken(2, puzzleID);
         solveKenken(3, puzzleID);
         solveKenken(4, puzzleID);

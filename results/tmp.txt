@@ -1,0 +1,428 @@
+APPROACH 1 ON INPUT1:
+——————————————————————
+Puzzle 1:
+Approach 1:
+Solution:
+1       3       2
+2       1       3
+3       2       1
+States generated: 5422
+Time in microseconds: 33209.453
+States/microseconds: 0.16326676624273215
+Puzzle 2:
+Approach 1:
+Solution:
+1       2       3
+3       1       2
+2       3       1
+States generated: 4174
+Time in microseconds: 11471.07
+States/microseconds: 0.36387189686751104
+Puzzle 3:
+Approach 1:
+Solution:
+3       1       2
+2       3       1
+1       2       3
+States generated: 14262
+Time in microseconds: 36842.477
+States/microseconds: 0.387107522656525
+Puzzle 4:
+Approach 1:
+Solution:
+1       3       2
+3       2       1
+2       1       3
+States generated: 5682
+Time in microseconds: 15691.689
+States/microseconds: 0.36210251171814584
+Puzzle 5:
+Approach 1:
+Solution:
+2       4       3       1
+1       3       4       2
+4       1       2       3
+3       2       1       4
+States generated: 2016265876
+Time in microseconds: 9.74422890666E8
+States/microseconds: 2.069189768953313
+
+################################
+APPROACH1 ON INPUT:
+——————————————————————
+Puzzle 1:
+Approach 1:
+Solution:
+3       2       4       1
+4       3       1       2
+2       1       3       4
+1       4       2       3
+States generated: 2632010551
+Time in microseconds: 1.290768651017E9
+States/microseconds: 2.0391032497777446
+Puzzle 2:
+Approach 1:
+Solution:
+2       3       4       1
+1       2       3       4
+4       1       2       3
+3       4       1       2
+States generated: 1813759666
+Time in microseconds: 8.64228340213E8
+States/microseconds: 2.0987042215636853
+Puzzle 3:
+Approach 1:
+Solution:
+2       4       1       3
+4       2       3       1
+1       3       2       4
+3       1       4       2
+States generated: 1926768526
+Time in microseconds: 8.39531876834E8
+States/microseconds: 2.2950510625827953
+Puzzle 4:
+Approach 1:
+Solution:
+3       1       4       2
+1       2       3       4
+4       3       2       1
+2       4       1       3
+States generated: 2367415411
+Time in microseconds: 1.028757299859E9
+States/microseconds: 2.301238019233958
+Puzzle 5:
+Approach 1:
+Solution:
+3       1       2       4
+1       2       4       3
+4       3       1       2
+2       4       3       1
+States generated: 2266947961
+Time in microseconds: 9.68172236499E8
+States/microseconds: 2.3414717707641493
+Puzzle 6:
+Puzzle 7:
+Puzzle 8:
+Puzzle 9:
+Puzzle 10:
+############################################
+APPROACH 2 ON INPUT1:
+——————————————————————
+Puzzle 1:
+Approach : 2
+Solution:
+1	3	2	
+2	1	3	
+3	2	1	
+States generated: 28
+Time in microseconds: 4054.393
+States/microseconds: 0.006906089271562969
+Puzzle 2:
+Approach : 2
+Solution:
+1	2	3	
+3	1	2	
+2	3	1	
+States generated: 37
+Time in microseconds: 892.099
+States/microseconds: 0.04147521743662979
+Puzzle 3:
+Approach : 2
+Solution:
+3	1	2	
+2	3	1	
+1	2	3	
+States generated: 208
+Time in microseconds: 5086.754
+States/microseconds: 0.04089051682074659
+Puzzle 4:
+Approach : 2
+Solution:
+1	3	2	
+3	2	1	
+2	1	3	
+States generated: 70
+Time in microseconds: 986.482
+States/microseconds: 0.07095922682826449
+Puzzle 5:
+Puzzle 5:
+Approach : 2
+Solution:
+2	4	3	1	
+1	3	4	2	
+4	1	2	3	
+3	2	1	4	
+States generated: 241
+Time in microseconds: 3151.2
+States/microseconds: 0.07647880172632648
+############################################
+APPROACH 2 ON INPUT:
+——————————————————————
+Puzzle 1:
+Approach : 2
+Solution:
+3	2	4	1	
+4	3	1	2	
+2	1	3	4	
+1	4	2	3	
+States generated: 1021
+Time in microseconds: 28133.826
+States/microseconds: 0.03629083367473731
+Puzzle 2:
+Approach : 2
+Solution:
+2	3	4	1	
+1	2	3	4	
+4	1	2	3	
+3	4	1	2	
+States generated: 205
+Time in microseconds: 2844.616
+States/microseconds: 0.07206596602142433
+Puzzle 3:
+Approach : 2
+Solution:
+2	4	1	3	
+4	2	3	1	
+1	3	2	4	
+3	1	4	2	
+States generated: 481
+Time in microseconds: 3703.613
+States/microseconds: 0.12987318059419276
+Puzzle 4:
+Approach : 2
+Solution:
+3	1	4	2	
+1	2	3	4	
+4	3	2	1	
+2	4	1	3	
+States generated: 217
+Time in microseconds: 1773.717
+States/microseconds: 0.12234195195738666
+Puzzle 5:
+Approach : 2
+Solution:
+3	1	2	4	
+1	2	4	3	
+4	3	1	2	
+2	4	3	1	
+States generated: 357
+Time in microseconds: 3314.267
+States/microseconds: 0.10771612546605329
+Puzzle 6:
+Approach : 2
+Solution:
+2	1	4	3	5	
+3	2	5	1	4	
+5	4	3	2	1	
+4	3	1	5	2	
+1	5	2	4	3	
+States generated: 15351
+Time in microseconds: 137697.852
+States/microseconds: 0.11148322052256848
+Puzzle 7:
+Approach : 2
+Solution:
+2	3	5	4	1	
+1	2	3	5	4	
+4	5	2	1	3	
+5	4	1	3	2	
+3	1	4	2	5	
+States generated: 37596
+Time in microseconds: 101116.205
+States/microseconds: 0.3718098399756992
+Puzzle 8:
+Approach : 2
+Solution:
+3	2	5	1	4	
+5	4	2	3	1	
+4	3	1	5	2	
+1	5	4	2	3	
+2	1	3	4	5	
+States generated: 2651
+Time in microseconds: 3395.535
+States/microseconds: 0.7807311660754491
+Puzzle 9:
+Approach : 2
+Solution:
+4	3	5	2	1	
+5	1	2	3	4	
+3	5	1	4	2	
+2	4	3	1	5	
+1	2	4	5	3	
+States generated: 3956
+Time in microseconds: 5873.723
+States/microseconds: 0.6735080969940189
+Puzzle 10:
+Puzzle 10:
+Approach : 2
+Solution:
+3	5	2	1	4	
+2	1	4	3	5	
+4	2	3	5	1	
+1	4	5	2	3	
+5	3	1	4	2	
+States generated: 2106
+Time in microseconds: 3838.992
+States/microseconds: 0.5485815026444442
+############################################
+APPROACH 3 ON INPUT1:
+——————————————————————
+Puzzle 1:
+Approach : 3
+Solution:
+1	3	2	
+2	1	3	
+3	2	1	
+States generated: 19
+Time in microseconds: 4893.92
+States/microseconds: 0.003882368326413182
+Puzzle 2:
+Approach : 3
+Solution:
+1	2	3	
+3	1	2	
+2	3	1	
+States generated: 23
+Time in microseconds: 1445.904
+States/microseconds: 0.01590700350784008
+Puzzle 3:
+Approach : 3
+Solution:
+3	1	2	
+2	3	1	
+1	2	3	
+States generated: 125
+Time in microseconds: 3998.471
+States/microseconds: 0.03126194988034176
+Puzzle 4:
+Approach : 3
+Solution:
+1	3	2	
+3	2	1	
+2	1	3	
+States generated: 44
+Time in microseconds: 1120.375
+States/microseconds: 0.03927256498940087
+Puzzle 5:
+Puzzle 5:
+Approach : 3
+Solution:
+2	4	3	1	
+1	3	4	2	
+4	1	2	3	
+3	2	1	4	
+States generated: 146
+Time in microseconds: 8892.674
+States/microseconds: 0.01641800880140214
+############################################
+APPROACH 3 ON INPUT:
+——————————————————————
+Puzzle 1:
+Approach : 3
+Solution:
+3	2	4	1	
+4	3	1	2	
+2	1	3	4	
+1	4	2	3	
+States generated: 561
+Time in microseconds: 32078.763
+States/microseconds: 0.01748820551465778
+Puzzle 2:
+Approach : 3
+Solution:
+2	3	4	1	
+1	2	3	4	
+4	1	2	3	
+3	4	1	2	
+States generated: 112
+Time in microseconds: 2214.239
+States/microseconds: 0.05058171227225245
+Puzzle 3:
+Approach : 3
+Solution:
+2	4	1	3	
+4	2	3	1	
+1	3	2	4	
+3	1	4	2	
+States generated: 267
+Time in microseconds: 5123.4
+States/microseconds: 0.052113830659327794
+Puzzle 4:
+Approach : 3
+Solution:
+3	1	4	2	
+1	2	3	4	
+4	3	2	1	
+2	4	1	3	
+States generated: 108
+Time in microseconds: 4390.575
+States/microseconds: 0.02459814488990622
+Puzzle 5:
+Approach : 3
+Solution:
+3	1	2	4	
+1	2	4	3	
+4	3	1	2	
+2	4	3	1	
+States generated: 209
+Time in microseconds: 1855.119
+States/microseconds: 0.11266123628726783
+Puzzle 6:
+Approach : 3
+Solution:
+2	1	4	3	5	
+3	2	5	1	4	
+5	4	3	2	1	
+4	3	1	5	2	
+1	5	2	4	3	
+States generated: 7871
+Time in microseconds: 141786.735
+States/microseconds: 0.055512950488633514
+Puzzle 7:
+Approach : 3
+Solution:
+2	3	5	4	1	
+1	2	3	5	4	
+4	5	2	1	3	
+5	4	1	3	2	
+3	1	4	2	5	
+States generated: 19460
+Time in microseconds: 118033.044
+States/microseconds: 0.1648690853046203
+Puzzle 8:
+Approach : 3
+Solution:
+3	2	5	1	4	
+5	4	2	3	1	
+4	3	1	5	2	
+1	5	4	2	3	
+2	1	3	4	5	
+States generated: 1127
+Time in microseconds: 3237.827
+States/microseconds: 0.34807295139610606
+Puzzle 9:
+Approach : 3
+Solution:
+4	3	5	2	1	
+5	1	2	3	4	
+3	5	1	4	2	
+2	4	3	1	5	
+1	2	4	5	3	
+States generated: 1969
+Time in microseconds: 3666.527
+States/microseconds: 0.5370204555973541
+Puzzle 10:
+Puzzle 10:
+Approach : 3
+Solution:
+3	5	2	1	4	
+2	1	4	3	5	
+4	2	3	5	1	
+1	4	5	2	3	
+5	3	1	4	2	
+States generated: 1097
+Time in microseconds: 3309.372
+States/microseconds: 0.33148283118368077
+############################################
+APPROACH 4 ON INPUT1:
+——————————————————————
