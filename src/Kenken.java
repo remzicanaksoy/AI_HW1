@@ -14,11 +14,11 @@ public class Kenken {
 
 
     public static void main(String[] args) {
-        String fileName = "input1.txt";
+        String fileName = "input.txt";
         String line = null;
         Kenken kenken = null;
         try {
-            writer = new FileWriter("solutions.txt", false);
+            writer = new FileWriter("output.txt", false);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -63,7 +63,7 @@ public class Kenken {
     private void solveKenken(int puzzleID) {
         if(filePrint) {
             try {
-                writer = new FileWriter("solutions.txt", true);
+                writer = new FileWriter("output.txt", true);
             } catch (IOException e) {
                 e.printStackTrace();
             }
